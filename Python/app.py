@@ -1,28 +1,15 @@
-from flask import Flask
-from config import DevelopmentConfig, TestingConfig, ProductionConfig
-import os
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-
-# env = os.getenv("FLASK_ENV", "development")
-
-# if env == "production":
-#     app.config.from_object(ProductionConfig)
-# elif env == "testing":
-#     app.config.from_object(TestingConfig)
-# else:
-#     app.config.from_object(DevelopmentConfig)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
-
-db = SQLAlchemy(app)
+from Python.models.user import User
+from config import db, app
 
 
-@app.route("/")
-def hello():
-    return "Hello, World!"
+@app.route("/create/<name>")
+def create_user(name):
+    db.session.add(User(name, f"{name}@gmail.com"))
+    db.session.commit()
+    return "created"
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run()
