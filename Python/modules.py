@@ -14,7 +14,7 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    def __init__(self, username, email):
+    def __init__(self, username: str, email: str):
         self.username = username
         self.email = email
 
@@ -34,7 +34,7 @@ class Task(Base):
 
     user: Mapped["User"] = relationship(back_populates="tasks")
 
-    def __init__(self, title, description, due_at=None):
+    def __init__(self, title: str, description: str, due_at=None):
         self.title = title
         self.description = description
         self.completed = False
