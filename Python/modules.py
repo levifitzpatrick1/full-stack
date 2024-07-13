@@ -1,45 +1,46 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy import Column, ForeignKey, DateTime
+from sqlalchemy import Column, ForeignKey, DateTime, UUID, String
+from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from config import db, Base
+import uuid
+
 
 
 class User(Base):
     __tablename__ = "Users"
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username: Mapped[str] = mapped_column(unique=True)
-    email: Mapped[str]
-    tasks: Mapped[List["Task"]] = relationship(
+    items: Mapped[List["Item"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    def __init__(self, username: str, email: str):
+    def __init__(self, username: str):
         self.username = username
-        self.email = email
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, username={self.username!r}, email={self.email!r}, tasks={self.tasks!r})"
+        return f"User(id={self.id!r}, username={self.username!r}, items={len(self.items)!r})"
 
 
-class Task(Base):
-    __tablename__ = "Tasks"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("Users.id"))
-    title = Column(db.String(120), nullable=False)
-    description = Column(db.String(200))
-    completed: Mapped[bool]
-    created_at = Column(DateTime, default=datetime.now)
-    due_at = Column(DateTime, nullable=True)
+class Item(Base):
+    __tablename__ = "Items"
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("Users.id"))
+    item_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(String(200))
+    barcode: Mapped[str] = mapped_column(String(120), nullable=False)
+    item_link: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
-    user: Mapped["User"] = relationship(back_populates="tasks")
+    user: Mapped["User"] = relationship(back_populates="items")
 
-    def __init__(self, title: str, description: str, due_at=None):
-        self.title = title
+    def __init__(self, item_name: str, description: Optional[str], barcode: str, item_link: str):
+        self.item_name = item_name
         self.description = description
-        self.completed = False
+        self.barcode = barcode
+        self.item_link = item_link
         self.created_at = datetime.now()
-        self.due_at = due_at
 
     def __repr__(self) -> str:
-        return f"Task(id={self.id!r}, title={self.title!r}, description={self.description!r}, completed={self.completed}, user={self.user_id!r})"
+        return f"Item(id={self.id!r}, item_name={self.item_name!r}, description={self.description!r}, barcode={self.barcode!r}, created_at={self.created_at!r}, user_id={self.user_id!r})"

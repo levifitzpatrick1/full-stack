@@ -1,21 +1,20 @@
-from modules import User, Task
+from modules import User, Item
 from config import db, app
-from flask import Flask, jsonify, request
+from flask import jsonify, request
+from helper import validate_item_data, validate_user_data
 
 
 @app.route("/user", methods=["GET", "POST"])
 def user():
+    data = request.get_json()
+    valid_data, error_message = validate_user_data(data, request.method)
+    if not valid_data:
+        return error_message
+    
     if request.method == "POST":
-        data = request.get_json()
-        if not data:
-            return jsonify(error="Invalid data"), 400
-
-        name = data.get("name")
-        if not name:
-            return jsonify(error="Name is required"), 400
-
-        email = f"{name}@gmail.com"
-        user = User(name, email)
+        validate_user_data(data)
+        name = data.get("username")
+        user = User(name)
         db.session.add(user)
         db.session.commit()
         return jsonify(message="User created", user_id=user.id), 201
@@ -29,35 +28,39 @@ def user():
         if not curr_user:
             return jsonify(error="User not found"), 404
 
-        return jsonify(user=curr_user.__repr__()), 200
+        return jsonify(user=curr_user), 200
 
     return jsonify(error="Method not allowed"), 405
 
 
-@app.route("/task", methods=["POST", "GET"])
-def task():
+@app.route("/Item", methods=["POST", "GET"])
+def item():
     data = request.get_json
+    valid_data, error_message = validate_item_data(data, request.method)
+    if not valid_data:
+        return error_message
+    
     if request.method == "POST":
         user_id = data.get("user_id")
-        title = data.get("title")
+        item_name = data.get("item_name")
         description = data.get("description")
+        barcode = data.get("barcode")
+        item_link = data.get("item_link")
 
-        if not user_id or not title or not description:
-            return jsonify(error="User ID, title, and description are required"), 400
+        if not user_id or not item_name or not description or not barcode or not item_link:
+            return jsonify(error="User ID, item_name, description, barcode, and item_link are required"), 400
 
         curr_user = db.session.get(User, user_id)
         if not curr_user:
             return jsonify(error="User not found"), 404
 
-        new_task = Task(title, description)
-        curr_user.tasks.append(new_task)
+        new_item = Item(item_name, description, barcode)
+        curr_user.tasks.append(new_item)
         db.session.commit()
         return jsonify(message="Task created"), 201
     
     elif request.method == "GET":
-        
-
-    return jsonify(error="Method not allowed"), 405
+        return jsonify(error="Method not allowed"), 405
 
 
 if __name__ == "__main__":
