@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { auth, user } from "$lib/firebase"
-    import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+    import { auth } from "$lib/firebase"
+    import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
     async function signInWithGoogle() {
         const provider = new GoogleAuthProvider();
@@ -9,4 +9,4 @@
     }
 </script>
 
-<button class="btn variant-filled-secondary" on:click={signInWithGoogle}>Sign in with Google</button>
+<button class="btn variant-filled-secondary" on:click={signInWithGoogle}>Link Google Account</button>

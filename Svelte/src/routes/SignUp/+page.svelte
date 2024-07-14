@@ -3,18 +3,25 @@
     import SignInCard from '$lib/components/signup_components/sign_in_card.svelte';
     import PhotoUpload from '$lib/components/signup_components/photo_upload.svelte';
     import UsernameCard from '$lib/components/signup_components/username_card.svelte';
-    import { userData } from '$lib/types';
-    import { goto, replaceState } from '$app/navigation';
+    import { userData } from '$lib/apiTypes';
+    import { goto } from '$app/navigation';
     import { user } from '$lib/firebase';
 
-    $: route = `/${$userData?.username}/edit`;
-
-    function onCompleteHandler(e: Event): void {
-        console.log('event:complete', e);
-        goto(`/${route}`) 
-    }
+    $: route = $userData?.username ? `/${$userData.username}` : '/';
     $: GoogleAuth = !$user;
     $: createdUsername = !$userData;
+
+    function onCompleteHandler(e: Event): void {
+        console.log('Event complete:', e);
+        console.log('Navigating to route:', route);
+
+        // Ensure the route is a relative path
+        if ($userData?.username) {
+            goto(route);
+        } else {
+            console.error('Username not found in userData');
+        }
+    }
 
 </script>
 

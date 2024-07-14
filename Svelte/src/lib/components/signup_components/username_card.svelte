@@ -1,9 +1,8 @@
 <script lang="ts">
     import { db, user } from "$lib/firebase";
-    import { doc, getDoc, writeBatch } from "firebase/firestore";
     import AuthCheck from "../auth_check.svelte";
     import { checkUsernameAvailability, confirmUsername, getUserData } from "$lib/api";
-    import { userData } from "$lib/types";
+    import { userData } from "$lib/apiTypes";
 
     let username = "";
     let loading = false;

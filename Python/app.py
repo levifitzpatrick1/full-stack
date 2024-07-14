@@ -4,6 +4,7 @@ from config import db, app
 from flask import jsonify, request, send_from_directory
 from helper import generate_response, generate_error, allowed_file
 import os
+from os.path import abspath, join
 
 @app.route('/uploads/<filename>', methods=["GET"])
 def uploaded_file(filename):
@@ -25,11 +26,19 @@ def upload_photo():
     
     if file.filename == '':
         return generate_error("No selected file", 400)
-    
+
+        
     if file and allowed_file(file.filename):
         filename = secure_filename(uid + file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file_path = abspath(join(app.config['UPLOAD_FOLDER'], filename))
+
+        print(f"file_path: {file_path}")
+        print(f"user.photo_path: {user.photo_path}")
+
         file.save(file_path)
+
+        if user.photo_path:
+            os.remove(user.photo_path)
 
         user.photo_path = file_path
         db.session.commit()

@@ -3,7 +3,7 @@
     import { ProgressBar } from "@skeletonlabs/skeleton";
     import defaultImage from "$lib/assests/user.png";
     import { uploadPhoto, apiPath } from "$lib/api";
-    import { userData } from "$lib/types";
+    import { userData } from "$lib/apiTypes";
     import { user } from "$lib/firebase";
 
 
@@ -11,10 +11,12 @@
     let uploading = false;
 
     async function upload(e: Event) {
+        uploading = true
         const input = e.target as HTMLInputElement;
         if (input.files && input.files[0]) {
             const file = input.files[0];
-            uploading = true
+
+            previewURL = URL.createObjectURL(file);
 
             try {
                 const photoPath = await uploadPhoto(file, $user!.uid);

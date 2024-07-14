@@ -1,0 +1,44 @@
+<script lang="ts">
+    import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+    import { userData } from '$lib/apiTypes';
+    import { getUserData } from '$lib/api';
+    import { auth, user } from '$lib/firebase';
+    import { signOut } from 'firebase/auth';
+    import { goto } from '$app/navigation';
+    import defaultImage from "$lib/assests/user.png";
+
+    let username: string;
+    $: username = $page.params.username;
+
+    $: isCurrentUser = ($userData?.username == username);
+
+    onMount( async () => {
+        console.log($user?.email)
+        console.log($userData?.username)
+        if (!$userData || $userData?.username !== username) {
+            await getUserData($user!.uid)
+        }
+    });
+
+    async function signOutEvent() {
+        try {
+            await signOut(auth)
+            goto('/')
+        } catch (error) {
+            console.log(error)
+        }
+            
+    }
+
+</script>
+
+{#if !isCurrentUser}
+    <h1>Auth Failed</h1>
+{/if}
+
+{#if isCurrentUser}
+    <h1>Welcome, {username}!</h1>
+    <img src={$userData?.photo} alt={defaultImage}/>
+    <button class="btn btn-md variant-filled-secondary" on:click={signOutEvent}>Sign Out</button>
+{/if}

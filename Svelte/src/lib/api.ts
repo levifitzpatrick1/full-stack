@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { UserData } from "./types";
+import type { UserData } from "./apiTypes";
 
 // TODO: this also needs to be figured out 
 export const apiPath = 'http://localhost:5000'
