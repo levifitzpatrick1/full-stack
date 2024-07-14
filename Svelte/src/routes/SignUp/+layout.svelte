@@ -17,7 +17,7 @@
     <h1 class="h1">My Things List</h1>
 </AppBar>
 <br>
-<main class="card w-4/12 bg-transparent text-neutral-content mx-auto">
+<main class="card w-6/12 bg-transparent text-neutral-content mx-auto">
     <div class="card-body">
       <slot />
     </div>

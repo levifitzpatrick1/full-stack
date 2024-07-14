@@ -3,8 +3,9 @@
     import SignInCard from '$lib/components/signup_components/sign_in_card.svelte';
     import PhotoUpload from '$lib/components/signup_components/photo_upload.svelte';
     import UsernameCard from '$lib/components/signup_components/username_card.svelte';
-    import { userData } from '$lib/firebase';
+    import { userData } from '$lib/types';
     import { goto, replaceState } from '$app/navigation';
+    import { user } from '$lib/firebase';
 
     $: route = `/${$userData?.username}/edit`;
 
@@ -12,27 +13,21 @@
         console.log('event:complete', e);
         goto(`/${route}`) 
     }
-    let lockedState: boolean = true;
+    $: GoogleAuth = !$user;
+    $: createdUsername = !$userData;
 
 </script>
 
 
-<style>
-    .stepper-container {
-        padding: 20px; /* Adjust padding as needed */
-    }
-</style>
-
-
-<div class="stepper-container">
+<div class="stepper-container p-5">
     <Stepper on:complete={onCompleteHandler}>
-        <Step>
+        <Step locked={GoogleAuth}>
             <svelte:fragment slot="header">Email</svelte:fragment>
             <div class="text-center">
                 <SignInCard />
             </div>
         </Step>
-        <Step>
+        <Step locked={createdUsername}>
             <svelte:fragment slot="header">Username</svelte:fragment>
             <div class="text-center">
                 <UsernameCard />

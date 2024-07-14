@@ -1,34 +1,38 @@
 <script lang="ts">
-    import { db, storage, user, userData } from "$lib/firebase";
-    import { updateDoc, doc } from "firebase/firestore";
-    import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
     import AuthCheck from "../auth_check.svelte";
     import { ProgressBar } from "@skeletonlabs/skeleton";
+    import defaultImage from "$lib/assests/user.png";
+    import { uploadPhoto, apiPath } from "$lib/api";
+    import { userData } from "$lib/types";
+    import { user } from "$lib/firebase";
 
-    import defaultImage from "$lib/assests/user.png"
 
     let previewURL: string;
     let uploading = false;
-    
-    async function upload(e:any) {
-        uploading = true;
-        const file = e.target.files[0];
-        previewURL = URL.createObjectURL(file);
-        const storageRef = ref(storage, `users/${$user!.uid}/profile.png`);
-        const result = await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(result.ref);
-        
-        await updateDoc(doc(db, "users", $user!.uid), { photoURL : url });
-        uploading = false;
+
+    async function upload(e: Event) {
+        const input = e.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            uploading = true
+
+            try {
+                const photoPath = await uploadPhoto(file, $user!.uid);
+                previewURL = `${apiPath}/uploads/${photoPath}`
+            } catch (error) {
+                console.error("Photo upload failed", error);
+            } finally {
+                uploading = false;
+            }
+        }
     }
-    
 </script>
 
 <AuthCheck>
     <form class="max-w-screen-md w-full">
         <div class="form-control w-full max-w-xs my-10 mx-auto text-center">
             <img 
-                src = {previewURL ?? $userData?.photoURL ?? defaultImage}
+                src = {previewURL ?? $userData?.photo ?? defaultImage}
                 alt="photoURL"
                 width="256"
                 height="256"

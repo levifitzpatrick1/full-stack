@@ -67,18 +67,3 @@ export function docStore<T>(
         id: docRef.id,
     };
 }
-
-interface UserData {
-    username: string;
-    bio: string;
-    photoURL: string;
-    links: any[];
-}
-
-export const userData: Readable<UserData | null> = derived(user, ($user, set) => { 
-    if ($user) {
-      return docStore<UserData>(`users/${$user.uid}`).subscribe(set);
-    } else {
-      set(null); 
-    }
-  });  

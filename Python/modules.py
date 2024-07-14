@@ -10,23 +10,28 @@ import uuid
 
 class User(Base):
     __tablename__ = "Users"
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    #id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    uid: Mapped[str] = mapped_column(unique=True, primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)
+    photo_path: Mapped[Optional[str]] = mapped_column(nullable=True)
     items: Mapped[List["Item"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
-    def __init__(self, username: str):
+    def __init__(self, username: str, uid: str, photo_path: Optional[str] = None):
         self.username = username
+        self.uid = uid
+        self.photo_path = photo_path
 
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, username={self.username!r}, items={len(self.items)!r})"
+        return f"User(id={self.uid!r}, username={self.username!r}, items={len(self.items)!r})"
 
 
 class Item(Base):
     __tablename__ = "Items"
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("Users.id"))
+    #user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("Users.uid"))
+    user_id: Mapped[str] = mapped_column(ForeignKey("Users.uid"))
     item_name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(200))
     barcode: Mapped[str] = mapped_column(String(120), nullable=False)
