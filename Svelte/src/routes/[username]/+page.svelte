@@ -7,7 +7,20 @@
     import { signOut } from 'firebase/auth';
     import { goto } from '$app/navigation';
     import defaultImage from "$lib/assests/user.png";
+    import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+			
+    const modalStore = getModalStore();
 
+    const modal: ModalSettings = {
+        type: 'component',
+        component: 'barcodeModal',
+        title: 'Scan Barcode'
+    };
+    
+    function triggerModal() {
+        modalStore.trigger(modal);
+    }
+                        
     let username: string;
     $: username = $page.params.username;
 
@@ -31,6 +44,7 @@
             
     }
 
+
 </script>
 
 {#if !isCurrentUser}
@@ -40,5 +54,6 @@
 {#if isCurrentUser}
     <h1>Welcome, {username}!</h1>
     <img src={$userData?.photo} alt={defaultImage}/>
+    <button class="btn btn-md variant-filled-primary" on:click={triggerModal}> modal </button>
     <button class="btn btn-md variant-filled-secondary" on:click={signOutEvent}>Sign Out</button>
 {/if}
