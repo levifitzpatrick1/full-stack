@@ -34,3 +34,9 @@ export const getUserData = async (uid: string): Promise<UserData> => {
     const response = await apiClient.get(`/user`, { params: { uid: uid } });
     return response.data.user;
 };
+
+export const getUserProfilePic = async (uid: string): Promise<File> => {
+    const response = await apiClient.get(`/user-profile-pic`, { params: { uid: uid } });
+    console.log(`${response.data}`)
+    return response.data;
+}

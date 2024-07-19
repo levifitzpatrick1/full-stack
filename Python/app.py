@@ -1,4 +1,4 @@
-from modules import User, Item
+from modules import User
 from werkzeug.utils import secure_filename
 from config import db, app
 from flask import jsonify, request, send_from_directory
@@ -6,9 +6,17 @@ from helper import generate_response, generate_error, allowed_file
 import os
 from os.path import abspath, join
 
-@app.route('/uploads/<filename>', methods=["GET"])
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/user-profile-pic', methods=["GET"])
+def get_userProfilePic():
+    uid = request.args.get('uid')
+    if not uid:
+        return generate_error("UID Required", 400)
+    
+    user = db.session.query(User).filter_by(uid=uid).first()
+    if not user:
+        return generate_error("User not found", 404+)
+    
+    return send_from_directory(app.config['UPLOAD_FOLDER'], user.photo_path)
 
 @app.route('/upload-photo', methods=["POST"])
 def upload_photo():
@@ -29,7 +37,7 @@ def upload_photo():
 
         
     if file and allowed_file(file.filename):
-        filename = secure_filename(uid + file.filename)
+        filename = secure_filename(uid + file.filename.split('.', -1))
         file_path = abspath(join(app.config['UPLOAD_FOLDER'], filename))
 
         print(f"file_path: {file_path}")

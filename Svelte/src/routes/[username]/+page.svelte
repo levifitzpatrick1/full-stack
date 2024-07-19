@@ -2,7 +2,7 @@
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import { userData } from '$lib/apiTypes';
-    import { getUserData } from '$lib/api';
+    import { getUserData, getUserProfilePic } from '$lib/api';
     import { auth, user } from '$lib/firebase';
     import { signOut } from 'firebase/auth';
     import { goto } from '$app/navigation';
@@ -24,6 +24,8 @@
     let username: string;
     $: username = $page.params.username;
 
+    let previewURL: string;
+
     $: isCurrentUser = ($userData?.username == username);
 
     onMount( async () => {
@@ -32,6 +34,8 @@
         if (!$userData || $userData?.username !== username) {
             await getUserData($user!.uid)
         }
+        previewURL = URL.createObjectURL(await getUserProfilePic($user!.uid));
+
     });
 
     async function signOutEvent() {

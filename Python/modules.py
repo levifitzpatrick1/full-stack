@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy import Column, ForeignKey, DateTime, UUID, String
 from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from config import db, Base
+from config import Base
 import uuid
 
 
